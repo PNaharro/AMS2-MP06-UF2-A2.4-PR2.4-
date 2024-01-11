@@ -1,61 +1,41 @@
 package com.project;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-
-/*
-
-Help: https://www.baeldung.com/hibernate-one-to-many
-
-*/
 
 public class Main {
 
-   public static void main(String[] args) {
-      
-      String basePath = System.getProperty("user.dir") + "/data/";
+    public static void main(String[] args) {
 
-      // Crear la carpeta 'data' si no existeix
-      File dir = new File(basePath);
-      if (!dir.exists()){
-         if(!dir.mkdirs()) {
-               System.out.println("Error en la creació de la carpeta 'data'");
-         }
-      }
+        String basePath = System.getProperty("user.dir") + "/data/";
 
-      Manager.createSessionFactory();
+        // Crear la carpeta 'data' si no existe
+        File dir = new File(basePath);
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                System.out.println("Error en la creación de la carpeta 'data'");
+            }
+        }
 
-      Cart refCart1 = Manager.addCart("Cart 1");
-      Cart refCart2 = Manager.addCart("Cart 2");
-      Cart refCart3 = Manager.addCart("Cart 3");
+        Manager.createSessionFactory();
 
-      Item refItem1 = Manager.addItem("Item 1");
-      Item refItem2 = Manager.addItem("Item 2");
-      Item refItem3 = Manager.addItem("Item 3");
-      Item refItem4 = Manager.addItem("Item 4");
-      Item refItem5 = Manager.addItem("Item 5");
-      Item refItem6 = Manager.addItem("Item 6");
+        Ciutat ciutat1 = Manager.addCiutat("Barcelona", "Spain", 12020);
+        Ciutat ciutat2 = Manager.addCiutat("Paris", "France", 75001);
+        Ciutat ciutat3 = Manager.addCiutat("New York", "USA", 10001);
 
-      Set<Item> itemsCard1 = new HashSet<Item>();
-      itemsCard1.add(refItem1);
-      itemsCard1.add(refItem2);
-      itemsCard1.add(refItem3);
+        Ciutada ciutada1 = Manager.addCiutada("Alice", "Smith", 25, ciutat1.getCiutatId());
+        Ciutada ciutada2 = Manager.addCiutada("Bob", "Johnson", 30, ciutat1.getCiutatId());
+        Ciutada ciutada3 = Manager.addCiutada("Charlie", "Brown", 28, ciutat2.getCiutatId());
+        Ciutada ciutada4 = Manager.addCiutada("David", "Williams", 35, ciutat2.getCiutatId());
+        Ciutada ciutada5 = Manager.addCiutada("Emma", "Davis", 22, ciutat3.getCiutatId());
+        Ciutada ciutada6 = Manager.addCiutada("Frank", "Miller", 40, ciutat3.getCiutatId());
 
-      Manager.updateCart(refCart1.getCartId(), refCart1.getType(), itemsCard1);
+        Manager.deleteCiutada(ciutada1.getId());
+        Manager.updateCiutada(ciutada2.getId(), "UpdatedName", "UpdatedLastName", 32);
 
-      Set<Item> itemsCard2 = new HashSet<Item>();
-      itemsCard2.add(refItem4);
-      itemsCard2.add(refItem5);
+        System.out.println(Manager.collectionToString(Ciutat.class, Manager.listCollection(Ciutat.class)));
+        System.out.println("--------------");
+        System.out.println(Manager.collectionToString(Ciutada.class, Manager.listCollection(Ciutada.class)));
 
-      Manager.updateCart(refCart2.getCartId(), refCart2.getType(), itemsCard2);
-
-      Manager.delete(Cart.class, refCart3.getCartId());
-      Manager.delete(Item.class, refItem6.getItemId());
-
-      System.out.println(Manager.collectionToString(Cart.class, Manager.listCollection(Cart.class, "")));
-      System.out.println(Manager.collectionToString(Item.class, Manager.listCollection(Item.class, "")));
-
-      Manager.close();
-   }
+        Manager.close();
+    }
 }
