@@ -1,166 +1,358 @@
 package com.project;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
+
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
-public class Manager {
+public class Manager implements Serializable {
 
     private static SessionFactory factory;
 
     public static void createSessionFactory() {
+
         try {
             Configuration configuration = new Configuration();
             configuration.configure();
-            StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                    .applySettings(configuration.getProperties()).build();
+            StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
+            configuration.getProperties()).build();
             factory = configuration.buildSessionFactory(serviceRegistry);
-        } catch (Throwable ex) {
+        } catch (Throwable ex) { 
             System.err.println("Failed to create sessionFactory object." + ex);
-            throw new ExceptionInInitializerError(ex);
+            throw new ExceptionInInitializerError(ex); 
         }
     }
 
-    public static void close() {
+    public static void close () {
         factory.close();
     }
-
-    public static Ciutat addCiutat(String nom, String pais, int codiPostal) {
+    public static Llibre addLlibre(String string, String editorial) {
         Session session = factory.openSession();
-        Transaction tx = null;
-        Ciutat result = null;
-        try {
-            tx = session.beginTransaction();
-            result = new Ciutat(nom, pais, codiPostal);
-            session.save(result);
-            tx.commit();
-        } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-            result = null;
-        } finally {
-            session.close();
-        }
-        return result;
-    }
+        Transaction transaction = null;
+        Llibre llibre = null;
 
-    public static Ciutada addCiutada(String nom, String cognom, int edat, long ciutatId) {
-        Session session = factory.openSession();
-        Transaction tx = null;
-        Ciutada result = null;
         try {
-            tx = session.beginTransaction();
-            result = new Ciutada(nom, cognom, edat);
-            session.save(result);
-            tx.commit();
-        } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-            result = null;
-        } finally {
-            session.close();
-        }
-        return result;
-    }
+            transaction = session.beginTransaction();
 
-    public static <T> T getById(Class<? extends T> clazz, long id) {
-        Session session = factory.openSession();
-        Transaction tx = null;
-        T obj = null;
-        try {
-            tx = session.beginTransaction();
-            obj = clazz.cast(session.get(clazz, id));
-            tx.commit();
-        } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
+            // Crear una instancia de la entidad Llibre
+            llibre = new Llibre();
+            llibre.setNom(string);
+            llibre.setEditorial(editorial);
+
+            // Guardar el llibre en la base de datos
+            session.save(llibre);
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();
         }
-        return obj;
+
+        return llibre;
     }
 
-    public static void updateCiutada(long ciutadaId, String nom, String cognom, int edat) {
+    public static Biblioteca addBiblioteca(String nom, String ciutat) {
         Session session = factory.openSession();
-        Transaction tx = null;
+        Transaction transaction = null;
+        Biblioteca biblioteca = null;
+
         try {
-            tx = session.beginTransaction();
-            Ciutada obj = (Ciutada) session.get(Ciutada.class, ciutadaId);
-            obj.setNom(nom);
-            obj.setCognom(cognom);
-            obj.setEdat(edat);
-            session.update(obj);
-            tx.commit();
-        } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
+            transaction = session.beginTransaction();
+
+            // Crear una instancia de la entidad Biblioteca
+            biblioteca = new Biblioteca();
+            biblioteca.setNom(nom);
+            biblioteca.setCiutat(ciutat);
+
+            // Guardar la biblioteca en la base de datos
+            session.save(biblioteca);
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return biblioteca;
+    }
+
+    public static void updateBiblioteca(Long bibliotecaId, String nom, String ciutat, Set<Llibre> llibres) {
+        Session session = factory.openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Obtener la biblioteca existente desde la base de datos
+            Biblioteca biblioteca = (Biblioteca) session.get(Biblioteca.class, bibliotecaId);
+
+            if (biblioteca != null) {
+                // Actualizar los atributos de la biblioteca
+                biblioteca.setNom(nom);
+                biblioteca.setCiutat(ciutat);
+
+                // Actualizar la colección de llibres asociada a la biblioteca
+                biblioteca.setLlibres(llibres);
+
+                // Guardar los cambios en la base de datos
+                session.update(biblioteca);
+
+                transaction.commit();
+            }
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();
         }
     }
 
-    public static void deleteCiutada(long ciutadaId) {
+    public static Persona addPersona(String dni, String nom, String telefon) {
         Session session = factory.openSession();
-        Transaction tx = null;
+        Transaction transaction = null;
+        Persona persona = null;
+
         try {
-            tx = session.beginTransaction();
-            Ciutada obj = (Ciutada) session.get(Ciutada.class, ciutadaId);
-            session.delete(obj);
-            tx.commit();
-        } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
+            transaction = session.beginTransaction();
+
+            // Crear una instancia de la entidad Persona
+            persona = new Persona();
+            persona.setDni(dni);
+            persona.setNom(nom);
+            persona.setTelefon(telefon);
+
+            // Guardar la persona en la base de datos
+            session.save(persona);
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return persona;
+    }
+
+    public static void updatePersona(Long personaId, String dni, String nom, String telefon, Set<Llibre> llibres) {
+        Session session = factory.openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Obtener la persona existente desde la base de datos
+            Persona persona = (Persona) session.get(Persona.class, personaId);
+
+            if (persona != null) {
+                // Actualizar los atributos de la persona
+                persona.setDni(dni);
+                persona.setNom(nom);
+                persona.setTelefon(telefon);
+
+                // Actualizar la colección de llibres asociada a la persona
+                persona.setLlibres(llibres);
+
+                // Guardar los cambios en la base de datos
+                session.update(persona);
+
+                transaction.commit();
+            }
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();
         }
     }
 
-    public static <T> Collection<?> listCollection(Class<? extends T> clazz) {
+    public static Autor addAutor(String nom) {
+        Session session = factory.openSession();
+        Transaction transaction = null;
+        Autor autor = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Crear una instancia de la entidad Autor
+            autor = new Autor();
+            autor.setNom(nom);
+
+            // Guardar el autor en la base de datos
+            session.save(autor);
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return autor;
+    }
+
+    public static void updateAutor(Long autorId, String nom, Set<Llibre> llibres) {
+        Session session = factory.openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Obtener el autor existente desde la base de datos
+            Autor autor = (Autor) session.get(Autor.class, autorId);
+
+            if (autor != null) {
+                // Actualizar los atributos del autor
+                autor.setNom(nom);
+
+                // Actualizar la colección de llibres asociada al autor
+                autor.setLlibres(llibres);
+
+                // Guardar los cambios en la base de datos
+                session.update(autor);
+
+                transaction.commit();
+            }
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Collection<?> listCollection(Class<?> clazz) {
         return listCollection(clazz, "");
     }
 
     public static <T> Collection<?> listCollection(Class<? extends T> clazz, String where) {
         Session session = factory.openSession();
-        Transaction tx = null;
+        Transaction transaction = null;
         Collection<?> result = null;
+
         try {
-            tx = session.beginTransaction();
-            Query query;
+            transaction = session.beginTransaction();
             if (where.length() == 0) {
-                query = session.createQuery("FROM " + clazz.getName());
+                result = session.createQuery("FROM " + clazz.getName()).list();
             } else {
-                query = session.createQuery("FROM " + clazz.getName() + " WHERE " + where);
+                result = session.createQuery("FROM " + clazz.getName() + " WHERE " + where).list();
             }
-            result = query.list();
-            tx.commit();
-        } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
             session.close();
         }
+
         return result;
     }
 
     public static <T> String collectionToString(Class<? extends T> clazz, Collection<?> collection) {
-        StringBuilder txt = new StringBuilder();
-        for (Object obj : collection) {
-            T cObj = clazz.cast(obj);
-            txt.append("\n").append(cObj.toString());
+        StringBuilder result = new StringBuilder();
+
+        result.append("=== ").append(clazz.getSimpleName()).append(" ===\n");
+
+        for (Object entity : collection) {
+            if (entity != null) {
+                result.append(entity).append("\n");
+            }
         }
-        if (txt.length() > 0 && txt.substring(0, 1).compareTo("\n") == 0) {
-            txt = new StringBuilder(txt.substring(1));
+
+        result.append("====================\n");
+
+        return result.toString();
+    }
+
+    public static void queryUpdate(String queryString) {
+        Session session = factory.openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            SQLQuery query = session.createSQLQuery(queryString);
+            query.executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    public static List<Object[]> queryTable(String queryString) {
+        Session session = factory.openSession();
+        Transaction transaction = null;
+        List<Object[]> result = null;
+
+        try {
+            transaction = session.beginTransaction();
+            SQLQuery query = session.createSQLQuery(queryString);
+            @SuppressWarnings("unchecked")
+            List<Object[]> rows = query.list();
+            result = rows;
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return result;
+    }
+
+    public static String tableToString(List<Object[]> rows) {
+        StringBuilder txt = new StringBuilder();
+        for (Object[] row : rows) {
+            for (Object cell : row) {
+                txt.append(cell.toString()).append(", ");
+            }
+            if (txt.length() >= 2 && txt.substring(txt.length() - 2).compareTo(", ") == 0) {
+                txt = new StringBuilder(txt.substring(0, txt.length() - 2));
+            }
+            txt.append("\n");
+        }
+        if (txt.length() >= 2) {
+            txt = new StringBuilder(txt.substring(0, txt.length() - 2));
         }
         return txt.toString();
     }
-
-    // Resto del código...
-
 }
