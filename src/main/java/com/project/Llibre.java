@@ -25,16 +25,12 @@ public class Llibre implements Serializable {
     private Autor autor;
 
     
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "LLibres_personas",
-        joinColumns = {@JoinColumn(referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")})
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "Llibre_Persona", joinColumns = @JoinColumn(name = "llibreId"), inverseJoinColumns = @JoinColumn(name = "personaId"))
     private Set<Persona> persones;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "llibres_bibliotecas",
-        joinColumns = {@JoinColumn(referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")})
+    @ManyToOne
+    @JoinColumn(name = "bibliotecaId")  // Ajusta el nombre de la columna según tu esquema
     private Biblioteca biblioteca;
 
     public Llibre() {

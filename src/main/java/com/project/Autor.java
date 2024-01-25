@@ -17,9 +17,9 @@ public class Autor implements Serializable {
     @Column(name = "nom")
     private String nom;
 
-    @OneToMany(mappedBy = "autor")
+    @OneToMany(mappedBy = "autor", fetch = FetchType.EAGER)
     private Set<Llibre> llibres;
-    
+
     public Autor() {
     }
 

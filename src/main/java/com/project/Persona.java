@@ -24,12 +24,9 @@ public class Persona implements Serializable {
     @Column(name = "telefon")
     private String telefon;
 
-    @ManyToMany
-    @JoinTable(
-        name = "Persona_Llibre", 
-        joinColumns = @JoinColumn(name = "persona_id"), 
-        inverseJoinColumns = @JoinColumn(name = "llibre_id"))
+    @ManyToMany(mappedBy = "persones", fetch = FetchType.EAGER)
     private Set<Llibre> llibres;
+    
 
     public Persona() {
     }

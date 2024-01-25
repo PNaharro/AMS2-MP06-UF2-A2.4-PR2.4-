@@ -280,21 +280,39 @@ public class Manager implements Serializable {
         return result;
     }
 
-    public static <T> String collectionToString(Class<? extends T> clazz, Collection<?> collection) {
+    public static String collectionToString(Class<?> entityClass, Collection<?> collection) {
         StringBuilder result = new StringBuilder();
-
-        result.append("=== ").append(clazz.getSimpleName()).append(" ===\n");
-
-        for (Object entity : collection) {
-            if (entity != null) {
-                result.append(entity).append("\n");
+        
+        result.append("=== ").append(entityClass.getSimpleName()).append(" ===\n");
+    
+        // Inicia una nueva transacción
+        Session session = factory.openSession();
+        Transaction transaction = session.beginTransaction();
+    
+        try {
+            for (Object entity : collection) {
+                if (entity != null) {
+                    result.append(entity).append("\n");
+                }
             }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            // Cierra la sesión al finalizar
+            session.close();
         }
-
+    
         result.append("====================\n");
-
+    
         return result.toString();
     }
+    
+    
+    
 
     public static void queryUpdate(String queryString) {
         Session session = factory.openSession();

@@ -20,11 +20,8 @@ public class Biblioteca implements Serializable {
     @Column(name = "ciutat")
     private String ciutat;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "bibliteca_llibre",
-        joinColumns = {@JoinColumn(referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(referencedColumnName = "id")})
-    private Set<Llibre> llibres;
+    @OneToMany(mappedBy = "biblioteca", fetch = FetchType.EAGER)
+private Set<Llibre> llibres;
 
     public Biblioteca() {
     }
