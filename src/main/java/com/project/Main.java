@@ -55,6 +55,7 @@ public class Main {
         llibresBib0.add(lib04);
         Manager.updateBiblioteca(bib0.getBibliotecaId(), 
         bib0.getNom(), bib0.getCiutat(), llibresBib0);
+        System.out.println("Libros asociados a la Biblioteca: " + bib0.getLlibres());
 
 
         Biblioteca bib1 = Manager.addBiblioteca("Biblio 1", "Ciutat 1");
@@ -192,8 +193,11 @@ public class Main {
         Manager.updateAutor(aut4.getAutorId(), aut4.getNom(), llibresAut4);
         
         
-        // LListar dades
+        
 
+
+        // LListar dades
+        System.out.println("llistas");
         @SuppressWarnings("unchecked")
         Collection<Llibre> colLlibres = (Collection<Llibre>) Manager.listCollection(Llibre.class, "");
         System.out.println(Manager.collectionToString(Llibre.class, colLlibres));

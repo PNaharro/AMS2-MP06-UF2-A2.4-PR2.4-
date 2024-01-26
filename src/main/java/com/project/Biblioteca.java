@@ -20,8 +20,9 @@ public class Biblioteca implements Serializable {
     @Column(name = "ciutat")
     private String ciutat;
 
-    @OneToMany(mappedBy = "biblioteca", fetch = FetchType.EAGER)
-private Set<Llibre> llibres;
+    @OneToMany(mappedBy = "biblioteca", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Llibre> llibres;
+    
 
     public Biblioteca() {
     }
@@ -66,7 +67,12 @@ private Set<Llibre> llibres;
 
     @Override
     public String toString() {
-        return "Biblioteca [bibliotecaId=" + bibliotecaId + ", nom=" + nom + ", ciutat=" + ciutat + ", llibres="
-                + llibres + "]";
+        Set<Llibre> llibres = getLlibres();
+        String a = "";
+        for (Llibre llibre : llibres) {
+            a += llibre.getNom()+ " | ";
+        }
+        System.out.println(a);
+        return bibliotecaId + " :" + nom + ", " + ciutat + ", llibres: [ "+ a + " ]";
     }
 }

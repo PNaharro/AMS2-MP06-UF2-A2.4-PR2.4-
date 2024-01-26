@@ -54,6 +54,10 @@ public class Autor implements Serializable {
 
     @Override
     public String toString() {
-        return "Autor [autorId=" + autorId + ", nom=" + nom + ", llibres=" + llibres + "]";
+        String string_libros = "";
+        for (Llibre llibre : llibres) {
+            string_libros += llibre.toString() + " | ";
+        }
+        return  autorId + " : " + nom + ", items: [ " + string_libros + "]";
     }
 }

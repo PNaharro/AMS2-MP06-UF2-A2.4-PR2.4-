@@ -1,6 +1,7 @@
 package com.project;
 
 
+import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -93,38 +94,31 @@ public class Manager implements Serializable {
         return biblioteca;
     }
 
-    public static void updateBiblioteca(Long bibliotecaId, String nom, String ciutat, Set<Llibre> llibres) {
+    public static void updateBiblioteca(long bibliotecaId, String nom, String ciutat, Set<Llibre> llibres) {
         Session session = factory.openSession();
-        Transaction transaction = null;
-
+        Transaction tx = null;
         try {
-            transaction = session.beginTransaction();
-
-            // Obtener la biblioteca existente desde la base de datos
+            tx = session.beginTransaction();
             Biblioteca biblioteca = (Biblioteca) session.get(Biblioteca.class, bibliotecaId);
-
+    
             if (biblioteca != null) {
-                // Actualizar los atributos de la biblioteca
                 biblioteca.setNom(nom);
                 biblioteca.setCiutat(ciutat);
-
-                // Actualizar la colección de llibres asociada a la biblioteca
                 biblioteca.setLlibres(llibres);
-
-                // Guardar los cambios en la base de datos
+    
                 session.update(biblioteca);
-
-                transaction.commit();
+                tx.commit();
             }
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
+        } catch (HibernateException e) {
+            if (tx != null) tx.rollback();
             e.printStackTrace();
         } finally {
             session.close();
         }
     }
+    
+
+    
 
     public static Persona addPersona(String dni, String nom, String telefon) {
         Session session = factory.openSession();
@@ -159,7 +153,7 @@ public class Manager implements Serializable {
     public static void updatePersona(Long personaId, String dni, String nom, String telefon, Set<Llibre> llibres) {
         Session session = factory.openSession();
         Transaction transaction = null;
-
+        System.out.println(llibres);
         try {
             transaction = session.beginTransaction();
 
@@ -174,6 +168,7 @@ public class Manager implements Serializable {
 
                 // Actualizar la colección de llibres asociada a la persona
                 persona.setLlibres(llibres);
+              
 
                 // Guardar los cambios en la base de datos
                 session.update(persona);
@@ -234,7 +229,7 @@ public class Manager implements Serializable {
 
                 // Actualizar la colección de llibres asociada al autor
                 autor.setLlibres(llibres);
-
+                
                 // Guardar los cambios en la base de datos
                 session.update(autor);
 
@@ -251,65 +246,48 @@ public class Manager implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public static Collection<?> listCollection(Class<?> clazz) {
+    public static <T> Collection<?> listCollection(Class<? extends T> clazz) {
         return listCollection(clazz, "");
     }
-
+    
     public static <T> Collection<?> listCollection(Class<? extends T> clazz, String where) {
-        Session session = factory.openSession();
-        Transaction transaction = null;
-        Collection<?> result = null;
-
+        Session session = null;
         try {
-            transaction = session.beginTransaction();
-            if (where.length() == 0) {
-                result = session.createQuery("FROM " + clazz.getName()).list();
-            } else {
-                result = session.createQuery("FROM " + clazz.getName() + " WHERE " + where).list();
-            }
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
-
-        return result;
-    }
-
-    public static String collectionToString(Class<?> entityClass, Collection<?> collection) {
-        StringBuilder result = new StringBuilder();
-        
-        result.append("=== ").append(entityClass.getSimpleName()).append(" ===\n");
-    
-        // Inicia una nueva transacción
-        Session session = factory.openSession();
-        Transaction transaction = session.beginTransaction();
-    
-        try {
-            for (Object entity : collection) {
-                if (entity != null) {
-                    result.append(entity).append("\n");
+            session = factory.openSession();
+            Transaction tx = session.beginTransaction();
+            Collection<?> result;
+            try {
+                if (where.length() == 0) {
+                    result = session.createQuery("FROM " + clazz.getName()).list();
+                } else {
+                    result = session.createQuery("FROM " + clazz.getName() + " WHERE " + where).list();
                 }
+                tx.commit();
+            } catch (HibernateException e) {
+                if (tx != null) tx.rollback();
+                throw e; // Re-lanzar la excepción después de manejarla
             }
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
+            return result;
         } finally {
-            // Cierra la sesión al finalizar
-            session.close();
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
         }
-    
-        result.append("====================\n");
-    
-        return result.toString();
     }
+    
+    public static <T> String collectionToString(Class<? extends T> clazz, Collection<?> collection) {
+        StringBuilder txt = new StringBuilder();
+        for (Object obj : collection) {
+            T cObj = clazz.cast(obj);
+            txt.append("\n").append(cObj.toString());
+        }
+        if (txt.length() > 0) {
+            txt.deleteCharAt(0); // Eliminar el primer carácter "\n"
+        }
+        return txt.toString();
+    }
+    
+    
     
     
     

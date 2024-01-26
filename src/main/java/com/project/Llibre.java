@@ -30,7 +30,7 @@ public class Llibre implements Serializable {
     private Set<Persona> persones;
 
     @ManyToOne
-    @JoinColumn(name = "bibliotecaId")  // Ajusta el nombre de la columna según tu esquema
+    @JoinColumn(name = "biblioteca_id")
     private Biblioteca biblioteca;
 
     public Llibre() {
@@ -94,8 +94,7 @@ public class Llibre implements Serializable {
 
     @Override
     public String toString() {
-        return "Llibre [llibreId=" + llibreId + ", nom=" + nom + ", editorial=" + editorial + ", autor=" + autor
-                + ", persones=" + persones + ", biblioteca=" + biblioteca + "]";
+        return llibreId +" : " + nom + ", " + editorial;
     }
 
 }

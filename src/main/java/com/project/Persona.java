@@ -80,7 +80,6 @@ public class Persona implements Serializable {
 
     @Override
     public String toString() {
-        return "Persona [personaId=" + personaId + ", dni=" + dni + ", nom=" + nom + ", telefon=" + telefon
-                + ", llibres=" + llibres + "]";
+        return personaId + " : " + nom + ", " + telefon+ ", llibres: [ " + llibres + "]";
     }
 }
