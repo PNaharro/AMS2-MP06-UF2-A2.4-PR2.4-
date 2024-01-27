@@ -11,31 +11,32 @@ import javax.persistence.*;
 public class Persona implements Serializable {
 
     @Id
-    @Column(name = "id", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long personaId;
+    @Column(name = "id", unique = true, nullable = false)
+    private long personaId;
 
     @Column(name = "dni")
     private String dni;
 
     @Column(name = "nom")
     private String nom;
-    
+
     @Column(name = "telefon")
     private String telefon;
 
-    @ManyToMany(mappedBy = "persones", fetch = FetchType.EAGER)
+    @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+    @JoinTable(name = "persona_llibre", joinColumns = {
+    @JoinColumn(referencedColumnName = "id") }, inverseJoinColumns = @JoinColumn(referencedColumnName = "id"))
     private Set<Llibre> llibres;
     
 
     public Persona() {
     }
 
-    public Persona(String dni, String nom, String telefon, Set<Llibre> llibres) {
+    public Persona(String dni, String nom, String telefon) {
         this.dni = dni;
         this.nom = nom;
         this.telefon = telefon;
-        this.llibres = llibres;
     }
 
     public Long getPersonaId() {
@@ -80,6 +81,6 @@ public class Persona implements Serializable {
 
     @Override
     public String toString() {
-        return personaId + " : " + nom + ", " + telefon+ ", llibres: [ " + llibres + "]";
+        return personaId + " : " + nom + ", " + telefon+ ", llibres: " + llibres;
     }
 }

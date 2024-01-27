@@ -19,30 +19,26 @@ public class Llibre implements Serializable {
 
     @Column(name = "editorial")
     private String editorial;
-    
+
     @ManyToOne
-    @JoinColumn(name = "autor_id", insertable=false,updatable=false)
+    @JoinColumn(name = "autor_id") 
     private Autor autor;
 
-    
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "Llibre_Persona", joinColumns = @JoinColumn(name = "llibreId"), inverseJoinColumns = @JoinColumn(name = "personaId"))
+    @ManyToMany(mappedBy = "llibres")
+    private Set<Biblioteca> biblioteca;
+
+    @ManyToMany(mappedBy = "llibres")
     private Set<Persona> persones;
 
-    @ManyToOne
-    @JoinColumn(name = "biblioteca_id")
-    private Biblioteca biblioteca;
 
     public Llibre() {
     }
 
-    public Llibre(String nom, String editorial, Autor autor, Set<Persona> persones, Biblioteca biblioteca) {
+    public Llibre(String nom, String editorial) {
         this.nom = nom;
         this.editorial = editorial;
-        this.autor = autor;
-        this.persones = persones;
-        this.biblioteca = biblioteca;
     }
+
 
     public long getLlibreId() {
         return llibreId;
@@ -74,22 +70,6 @@ public class Llibre implements Serializable {
 
     public void setAutor(Autor autor) {
         this.autor = autor;
-    }
-
-    public Set<Persona> getPersones() {
-        return persones;
-    }
-
-    public void setPersones(Set<Persona> persones) {
-        this.persones = persones;
-    }
-
-    public Biblioteca getBiblioteca() {
-        return biblioteca;
-    }
-
-    public void setBiblioteca(Biblioteca biblioteca) {
-        this.biblioteca = biblioteca;
     }
 
     @Override

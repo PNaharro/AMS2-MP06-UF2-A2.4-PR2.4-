@@ -38,12 +38,18 @@
             <artifactId>hibernate4-sqlite-dialect</artifactId>
             <version>0.1.2</version>
         </dependency>
-    
-      <dependency>
-        <groupId>org.springframework.data</groupId>
-        <artifactId>spring-data-jpa</artifactId>
-        <version>2.1.10.RELEASE</version>
-      </dependency>
+        <!---->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.3.12</version> <!-- Ajusta la versión según tus necesidades -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>5.3.12</version>
+        </dependency>
+
     </dependencies>
     <profiles>
         <profile>
@@ -59,6 +65,16 @@
                             <mainClass>${exec.mainClass}</mainClass>
                         </configuration>
                     </plugin>
+                    <!---->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <configuration>
+                            <mainClass>${exec.mainClass}</mainClass>
+                        </configuration>
+                    </plugin>
+        
                 </plugins>
             </build>
         </profile>

@@ -1,9 +1,15 @@
 package com.project;
 
-import java.io.Serializable;
-import java.util.Set;
-
 import javax.persistence.*;
+
+import org.hibernate.Hibernate;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "Autor", 
@@ -12,21 +18,22 @@ public class Autor implements Serializable {
     @Id
     @Column(name = "id", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long autorId;
+    private long autorId;
 
     @Column(name = "nom")
     private String nom;
 
-    @OneToMany(mappedBy = "autor", fetch = FetchType.EAGER)
+
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER) 
     private Set<Llibre> llibres;
 
     public Autor() {
     }
 
-    public Autor(String nom, Set<Llibre> llibres) {
+    public Autor(String nom) {
         this.nom = nom;
-        this.llibres = llibres;
     }
+
 
     public Long getAutorId() {
         return autorId;
@@ -45,19 +52,20 @@ public class Autor implements Serializable {
     }
 
     public Set<Llibre> getLlibres() {
+        Hibernate.initialize(llibres);
         return llibres;
     }
 
     public void setLlibres(Set<Llibre> llibres) {
         this.llibres = llibres;
+        for (Llibre llibre : llibres) {
+            llibre.setAutor(this);
+        }
     }
 
     @Override
     public String toString() {
-        String string_libros = "";
-        for (Llibre llibre : llibres) {
-            string_libros += llibre.toString() + " | ";
-        }
-        return  autorId + " : " + nom + ", items: [ " + string_libros + "]";
+       
+        return  autorId + " : " + nom + ", items: " + llibres;
     }
 }

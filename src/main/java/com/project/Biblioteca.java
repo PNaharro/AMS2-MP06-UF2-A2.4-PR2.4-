@@ -12,25 +12,27 @@ public class Biblioteca implements Serializable {
     @Id
     @Column(name = "id", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bibliotecaId;
-    
+    private long bibliotecaId;
+
     @Column(name = "nom")
     private String nom;
 
     @Column(name = "ciutat")
     private String ciutat;
 
-    @OneToMany(mappedBy = "biblioteca", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
+    @JoinTable(name = "Llibre_Biblioteca", joinColumns = {
+    @JoinColumn(referencedColumnName = "id") }, inverseJoinColumns = {
+    @JoinColumn(referencedColumnName = "id") })
     private Set<Llibre> llibres;
     
 
     public Biblioteca() {
     }
 
-    public Biblioteca(String nom, String ciutat, Set<Llibre> llibres) {
+    public Biblioteca(String nom, String ciutat) {
         this.nom = nom;
         this.ciutat = ciutat;
-        this.llibres = llibres;
     }
 
     public Long getBibliotecaId() {
@@ -67,12 +69,6 @@ public class Biblioteca implements Serializable {
 
     @Override
     public String toString() {
-        Set<Llibre> llibres = getLlibres();
-        String a = "";
-        for (Llibre llibre : llibres) {
-            a += llibre.getNom()+ " | ";
-        }
-        System.out.println(a);
-        return bibliotecaId + " :" + nom + ", " + ciutat + ", llibres: [ "+ a + " ]";
+        return bibliotecaId + " :" + nom + ", " + ciutat + ", llibres: "+ llibres;
     }
 }
